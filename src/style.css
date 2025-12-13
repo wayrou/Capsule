@@ -1,0 +1,1238 @@
+:root {
+  --app-bg: #f7f3ec;
+  --bg: #f4eee6;
+  --box-bg: #f3dac0;
+  --box-edge: #d9b997;
+  --box-shadow: rgba(0, 0, 0, 0.12);
+  --accent: #c4803a;
+  --accent-soft: #e2a56b;
+  --text-main: #3f2b1e;
+  --text-muted: #7a6455;
+  --border-soft: rgba(63, 43, 30, 0.12);
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --transition-fast: 0.16s ease-out;
+  --panel-bg: rgba(255, 250, 243, 0.96);
+  --capsule-muted: #7a6455;
+  --capsule-border-subtle: rgba(63, 43, 30, 0.12);
+
+  font-size: 16px;
+}
+
+/* ========= THEMES ========= */
+
+/* Light (Paper) */
+:root[data-theme="light"],
+body.theme-light {
+  --app-bg: #f7f3ec;
+  --bg: #f4eee6;
+  --box-bg: #f3dac0;
+  --box-edge: #d9b997;
+  --box-shadow: rgba(0, 0, 0, 0.12);
+  --accent: #c4803a;
+  --accent-soft: #e2a56b;
+  --text-main: #3f2b1e;
+  --text-muted: #7a6455;
+  --border-soft: rgba(63, 43, 30, 0.12);
+  --panel-bg: rgba(255, 250, 243, 0.96);
+}
+
+/* Dark (Warm) */
+:root[data-theme="dark"],
+body.theme-dark {
+  --app-bg: #15100e;
+  --bg: #18110d;
+  --box-bg: #211711;
+  --box-edge: #3a2820;
+  --box-shadow: rgba(0, 0, 0, 0.6);
+  --accent: #f2b170;
+  --accent-soft: #c78951;
+  --text-main: #f5e7d7;
+  --text-muted: #cbb199;
+  --border-soft: rgba(245, 231, 215, 0.18);
+  --panel-bg: #211711;
+}
+
+/* Night Shift (Onyx) */
+:root[data-theme="night"],
+body.theme-night {
+  --app-bg: #050509;
+  --bg: #020617;
+  --box-bg: #020617;
+  --box-edge: #111827;
+  --box-shadow: rgba(0, 0, 0, 0.8);
+  --accent: #5865f2;
+  --accent-soft: #4f46e5;
+  --text-main: #e5e7eb;
+  --text-muted: #9ca3af;
+  --border-soft: rgba(148, 163, 184, 0.4);
+  --panel-bg: #020617;
+}
+
+/* North Pole (White) */
+:root[data-theme="north"],
+body.theme-north {
+  --app-bg: #f5fbff;
+  --bg: #f5fbff;
+  --box-bg: #eff6ff;
+  --box-edge: #cbd5f5;
+  --box-shadow: rgba(15, 23, 42, 0.18);
+  --accent: #0ea5e9;      /* icy blue */
+  --accent-soft: #7dd3fc;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-soft: rgba(148, 163, 184, 0.45);
+  --panel-bg: rgba(255, 255, 255, 0.98);
+}
+
+/* ========= GLOBAL ========= */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text-main);
+  background: radial-gradient(circle at top, #fdf7ef 0, var(--bg) 55%);
+  transition: background 220ms ease-out, color 220ms ease-out;
+}
+
+/* Per-theme body backgrounds */
+body.theme-dark {
+  background: radial-gradient(circle at top, #261812 0, var(--bg) 55%);
+}
+
+body.theme-night {
+  background:
+    radial-gradient(circle at top, #020617 0, #020617 40%),
+    radial-gradient(circle at bottom, #020617 0, #020617 60%);
+}
+
+body.theme-north {
+  background:
+    radial-gradient(circle at top, #ffffff 0, #f3f8ff 55%),
+    radial-gradient(circle at bottom, #ebf4ff 0, #edf2ff 60%);
+}
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ========= HEADER / TOOLBAR ========= */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem;
+  gap: 1rem;
+  flex-wrap: nowrap;
+  border-bottom: 1px solid var(--border-soft);
+  background: linear-gradient(to bottom, #fffaf4, #f2e5d7);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Dark header */
+body.theme-dark .app-header {
+  background: linear-gradient(to bottom, #261812, #1a120f);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.6);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+/* Night header */
+body.theme-night .app-header {
+  background: linear-gradient(to bottom, #020617, #020617);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.9);
+  box-shadow:
+    0 1px 0 rgba(148, 163, 184, 0.1),
+    0 10px 30px rgba(15, 23, 42, 0.6);
+}
+
+/* North Pole header */
+body.theme-north .app-header {
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(231, 241, 255, 0.95));
+  border-bottom: 1px solid rgba(176, 196, 222, 0.6);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9),
+    0 8px 24px rgba(148, 180, 214, 0.45);
+  backdrop-filter: blur(14px);
+}
+
+.app-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-right: 0.75rem;
+  padding-right: 0.75rem;
+  border-right: 1px solid var(--border-soft);
+}
+
+.app-icon {
+  font-size: 1.4rem;
+}
+
+.app-name {
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+#toolbar {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  align-items: center;
+  overflow-x: auto;
+}
+
+#toolbar button {
+  white-space: nowrap;
+  flex: 0 0 auto;
+}
+
+button {
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  padding: 0.35rem 0.9rem;
+  background: #fffaf4;
+  font: inherit;
+  color: var(--text-main);
+  cursor: pointer;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition:
+    background var(--transition-fast),
+    box-shadow var(--transition-fast),
+    transform 120ms ease-out;
+}
+
+button:hover {
+  background: #fff1df;
+  box-shadow: 0 2px 6px var(--box-shadow);
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+/* North Pole button tweaks */
+body.theme-north button {
+  background: #ffffff;
+  border-color: rgba(148, 163, 184, 0.5);
+  box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.25);
+}
+
+body.theme-north button:hover {
+  background: #e0f2fe;
+  box-shadow:
+    0 0 0 1px rgba(59, 130, 246, 0.45),
+    0 6px 18px rgba(15, 23, 42, 0.18);
+}
+
+.icon-button {
+  margin-left: auto;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 4px 8px;
+}
+
+.icon-button:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+/* Smart status bar */
+
+.smart-status-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.smart-status-main {
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.smart-status-meta {
+  font-size: 11px;
+  opacity: 0.85;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* ========= MAIN LAYOUT ========= */
+
+.app-main {
+  flex: 1;
+  padding: 1rem 1rem 0.75rem; /* little extra bottom padding */
+  display: flex;
+  align-items: flex-start;    /* card hugs the top, not stretched */
+}
+
+.box-panel {
+  flex: 1;
+  max-width: 1100px;
+  margin: 0 auto;
+  background: radial-gradient(circle at top left, #f7e4cc, var(--box-bg) 55%);
+  border-radius: var(--radius-lg);
+  box-shadow:
+    0 14px 30px var(--box-shadow),
+    inset 0 0 0 1px var(--box-edge);
+  padding: 0.75rem 0.75rem 1.25rem; /* 👈 extra bottom padding so content ends before curve */
+  position: relative;
+  overflow: visible;          /* let shadows + radius show naturally */
+}
+
+
+/* keep your theme overrides for .box-panel below this as-is */
+
+
+/* Night box */
+body.theme-night .box-panel {
+  background: radial-gradient(circle at top left, #020617, var(--box-bg) 55%);
+  box-shadow:
+    0 24px 60px rgba(15, 23, 42, 0.9),
+    inset 0 0 0 1px #111827;
+}
+
+/* North Pole box */
+body.theme-north .box-panel {
+  background: radial-gradient(circle at top left, #ffffff, #fafdff 50%);
+  box-shadow:
+    0 22px 50px rgba(148, 180, 214, 0.45),
+    inset 0 0 0 1px rgba(191, 219, 254, 0.9);
+}
+
+.box-panel::before,
+.box-panel::after {
+  content: "";
+  position: absolute;
+  inset-inline: 12px;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.04);
+  bottom: -4px;
+  filter: blur(2px);
+  z-index: -1;
+}
+
+/* ========= TABS ========= */
+
+.tab-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 6px;
+  margin-bottom: 6px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 3px rgba(15, 23, 42, 0.12);
+  overflow-x: auto;
+}
+
+body.theme-dark .tab-bar {
+  background: rgba(35, 23, 18, 0.8);
+}
+
+body.theme-night .tab-bar {
+  background: rgba(15, 23, 42, 0.85);
+}
+
+body.theme-north .tab-bar {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid transparent;
+  white-space: nowrap;
+  transition:
+    background 120ms ease-out,
+    transform 120ms ease-out,
+    box-shadow 120ms ease-out,
+    border-color 120ms ease-out;
+}
+
+.tab:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.tab.active {
+  background: rgba(130, 96, 255, 0.16);
+  border-color: rgba(130, 96, 255, 0.5);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.18);
+}
+
+body.theme-night .tab.active,
+body.theme-north .tab.active {
+  background: rgba(124, 166, 255, 0.2);
+  border-color: rgba(129, 140, 248, 0.7);
+}
+
+.tab-title {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 140px;
+}
+
+.tab-close {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 0;
+}
+
+.tab-add {
+  margin-left: 4px;
+  border-radius: 999px;
+  border: none;
+  padding: 3px 10px;
+  cursor: pointer;
+  background: transparent;
+  font-size: 1rem;
+}
+
+.tab-add:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* ========= DROPZONE ========= */
+
+.dropzone {
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border-soft);
+  background: rgba(255, 253, 248, 0.88);
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.75rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  outline: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.dropzone:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(196, 128, 58, 0.35);
+}
+
+/* North Pole dropzone tweaks */
+body.theme-north .dropzone {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(148, 163, 184, 0.6);
+}
+
+.dropzone-inner {
+  text-align: center;
+}
+
+.dropzone-title {
+  font-weight: 600;
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.dropzone-subtitle {
+  margin: 0.1rem 0 0.4rem;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.dropzone-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  opacity: 0.5;
+  margin-top: 0.4rem;
+}
+
+.dropzone-active {
+  border-color: var(--accent);
+  background: rgba(255, 245, 232, 0.96);
+  box-shadow:
+    0 0 0 1px rgba(196, 128, 58, 0.25),
+    0 4px 10px var(--box-shadow);
+  transform: translateY(-1px);
+}
+
+.dropzone-active::after {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.6), transparent 60%);
+  opacity: 0.6;
+  pointer-events: none;
+  animation: drop-ripple 600ms ease-out;
+}
+
+@keyframes drop-ripple {
+  from {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  to {
+    transform: scale(1.2);
+    opacity: 0;
+  }
+}
+
+/* ========= CONTENT SPLIT ========= */
+
+.content-split {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 0.75rem;
+  min-height: 260px;
+  height: auto;               /* 👈 was calc(100% - 110px); remove that */
+  margin-bottom: 0.5rem;      /* 👈 keeps inner panels away from card’s bottom radius */
+}
+
+.archive-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.archive-card {
+  padding: 0.6rem 0.7rem;
+  border-radius: var(--radius-md);
+  background: var(--panel-bg);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border-soft);
+}
+
+.archive-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+}
+
+.archive-stats {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+}
+
+.archive-stats dt {
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.archive-stats dd {
+  margin: 0;
+}
+
+.archive-tree {
+  flex: 1;
+  border-radius: var(--radius-md);
+  background: var(--panel-bg);
+  border: 1px solid var(--border-soft);
+  display: flex;
+  flex-direction: column;
+}
+
+.tree-header {
+  padding: 0.45rem 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(63, 43, 30, 0.08);
+  color: var(--text-muted);
+}
+
+.tree-view {
+  list-style: none;
+  margin: 0;
+  padding: 0.4rem 0.6rem 0.6rem;
+  font-size: 0.8rem;
+  overflow: auto;
+}
+
+.tree-empty {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.tree-folder,
+.tree-file {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 4px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 120ms ease-out;
+}
+
+.tree-folder:hover,
+.tree-file:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.tree-folder-icon,
+.tree-file-icon {
+  width: 16px;
+  text-align: center;
+}
+
+.tree-folder-label,
+.tree-file-label {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tree-view-nested {
+  list-style: none;
+  margin: 0.15rem 0 0.15rem 0.9rem;
+  padding: 0;
+  border-left: 1px solid rgba(63, 43, 30, 0.15);
+}
+
+.tree-collapsed {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 180ms ease-out, opacity 180ms ease-out;
+}
+
+.tree-expanded {
+  max-height: 600px;
+  opacity: 1;
+}
+
+/* ========= FILE PANEL ========= */
+
+.file-panel {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-md);
+  background: var(--panel-bg);
+  border: 1px solid var(--border-soft);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.file-panel-header {
+  display: flex;
+  align-items: center;
+  padding: 0.45rem 0.7rem;
+  border-bottom: 1px solid rgba(63, 43, 30, 0.08);
+  gap: 0.5rem;
+}
+
+.file-panel-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  flex: 1;
+}
+
+.file-panel-actions {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.file-panel-actions input[type="search"],
+.file-panel-actions select {
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(63, 43, 30, 0.18);
+  background: #fffdf9;
+}
+
+.file-list-wrapper {
+  flex: 1;
+  overflow: auto;
+}
+
+.file-list {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.file-list thead {
+  position: sticky;
+  top: 0;
+  background: #f7ecdd;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+  z-index: 1;
+}
+
+/* North Pole table header */
+body.theme-north .file-list thead {
+  background: #e0f2fe;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.file-list th,
+.file-list td {
+  padding: 0.35rem 0.55rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(63, 43, 30, 0.06);
+}
+
+.file-list th {
+  font-weight: 600;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.file-list tbody tr:hover {
+  background: rgba(226, 165, 107, 0.08);
+}
+
+.file-list-empty td {
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+tr.file-selected,
+tr.file-selected td {
+  background-color: var(--app-bg);
+}
+
+tr.file-selected td {
+  font-weight: 500;
+}
+
+/* ========= PREVIEW PANEL ========= */
+
+.preview-panel {
+  margin-top: 0.4rem;
+  border-top: 1px solid rgba(63, 43, 30, 0.08);
+  padding-top: 0.35rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.preview-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-size: 0.8rem;
+}
+
+#preview-title {
+  font-weight: 600;
+}
+
+.preview-meta {
+  font-size: 0.75rem;
+  color: var(--capsule-muted);
+}
+
+.preview-body {
+  border-radius: 8px;
+  background: rgba(255, 250, 243, 0.9);
+  border: 1px solid rgba(63, 43, 30, 0.08);
+  padding: 0.5rem 0.6rem;
+  min-height: 80px;
+  max-height: 220px;
+  overflow: auto;
+  font-size: 0.78rem;
+}
+
+/* North Pole preview body tweak */
+body.theme-north .preview-body {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(148, 163, 184, 0.4);
+}
+
+.preview-message {
+  color: var(--capsule-muted);
+  font-style: italic;
+}
+
+.preview-text,
+.preview-hex {
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 200px;
+  display: block;
+  border-radius: 6px;
+}
+
+.preview-footer {
+  font-size: 0.72rem;
+  color: var(--capsule-muted);
+}
+
+/* ========= STATUS BAR ========= */
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-soft);
+  background: linear-gradient(to top, #e8d4be, #f5e7d5);
+  margin-top: 0.25rem;        /* 👈 clear separation from card */
+}
+
+/* North Pole status bar */
+body.theme-north .status-bar {
+  background: linear-gradient(to top, #e0f2fe, #f1f5f9);
+  border-top: 1px solid rgba(148, 163, 184, 0.6);
+}
+
+.status-progress {
+  width: 90px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+.status-progress-bar {
+  width: 0;
+  height: 100%;
+  background: linear-gradient(to right, var(--accent-soft), var(--accent));
+  transition: width 0.2s ease-out;
+}
+
+/* ========= SETTINGS OVERLAY ========= */
+
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+}
+
+.settings-overlay.open {
+  display: flex;
+}
+
+.settings-panel {
+  background: #fffaf4;
+  color: var(--text-main);
+  border-radius: 18px;
+  padding: 16px 18px 18px;
+  min-width: 320px;
+  max-width: 420px;
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.35),
+    0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.settings-header h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.settings-close-btn {
+  border: none;
+  background: transparent;
+  font-size: 1.15rem;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+.settings-close-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.settings-section {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding-top: 10px;
+  margin-top: 6px;
+}
+
+.settings-section h3 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+  margin: 0 0 8px;
+}
+
+.settings-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.settings-toggle-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.settings-toggle input[type="radio"] {
+  accent-color: var(--accent);
+}
+
+.settings-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* ========= CONTEXT MENU ========= */
+
+.context-menu {
+  position: fixed;
+  min-width: 200px;
+  background: var(--panel-bg);
+  border: 1px solid var(--border-soft);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  z-index: 1000;
+  padding: 4px 0;
+}
+
+.context-menu[hidden] {
+  display: none;
+}
+
+.context-menu button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 6px 12px;
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.context-menu button:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* ========= ABOUT OVERLAY ========= */
+
+#about-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.35);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+}
+
+#about-overlay.open {
+  display: flex;
+}
+
+.about-panel {
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 18px;
+  padding: 18px 20px 20px;
+  min-width: 320px;
+  max-width: 420px;
+  box-shadow:
+    0 18px 40px rgba(15, 23, 42, 0.4),
+    0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+.about-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.about-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.about-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.about-footer {
+  margin-top: 12px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+/* ========= RESPONSIVE ========= */
+
+@media (max-width: 880px) {
+  .content-split {
+    grid-template-columns: minmax(0, 1fr);
+    grid-auto-rows: auto;
+    height: auto;
+  }
+
+  .archive-sidebar {
+    order: 2;
+  }
+
+  .file-panel {
+    order: 1;
+    min-height: 220px;
+  }
+}
+
+/* ========= MISC ========= */
+
+/* Hide legacy top-toolbar Open button (we use Browse in the lid instead) */
+#btn-open-archive {
+  display: none !important;
+}
+
+
+/* ============================
+   THEME-SPECIFIC BUTTON + DROPZONE FIXES
+   ============================ */
+
+/* WARM/LIGHT (default) – keep existing look, but base it on panel color */
+body.theme-light button,
+body.theme-light #toolbar button {
+  background: #fffaf4;
+}
+
+/* ----- DARK THEME ----- */
+body.theme-dark button,
+body.theme-dark #toolbar button {
+  background: #2b1c16;
+  border-color: rgba(0, 0, 0, 0.65);
+  color: var(--text-main);
+  box-shadow:
+    0 1px 0 rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+body.theme-dark button:hover,
+body.theme-dark #toolbar button:hover {
+  background: #3a241b;
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.9),
+    0 0 0 1px rgba(0, 0, 0, 0.45);
+}
+
+/* Dark theme drop tray */
+body.theme-dark .dropzone {
+  background: #211711;
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(0, 0, 0, 0.6);
+}
+
+body.theme-dark .dropzone-active {
+  background: #2b1c16;
+  border-color: var(--accent-soft);
+}
+
+/* ----- NIGHT THEME ----- */
+body.theme-night button,
+body.theme-night #toolbar button {
+  background: #020617;
+  border-color: rgba(15, 23, 42, 0.9);
+  color: var(--text-main);
+  box-shadow:
+    0 1px 0 rgba(15, 23, 42, 0.9),
+    0 0 0 1px rgba(15, 23, 42, 0.8);
+}
+
+body.theme-night button:hover,
+body.theme-night #toolbar button:hover {
+  background: #020922;
+  box-shadow:
+    0 2px 8px rgba(15, 23, 42, 0.95),
+    0 0 0 1px rgba(129, 140, 248, 0.6);
+}
+
+/* Night theme drop tray */
+body.theme-night .dropzone {
+  background: #020617;
+  border-color: rgba(148, 163, 184, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(15, 23, 42, 0.9),
+    0 0 0 1px rgba(15, 23, 42, 0.9);
+}
+
+body.theme-night .dropzone-active {
+  background: #020922;
+  border-color: rgba(129, 140, 248, 0.8);
+}
+
+/* North pole already mostly correct, but ensure buttons match */
+body.theme-north button,
+body.theme-north #toolbar button {
+  background: #ffffff;
+  border-color: rgba(148, 163, 184, 0.5);
+  box-shadow:
+    0 0 0 1px rgba(148, 163, 184, 0.3),
+    0 4px 12px rgba(148, 180, 214, 0.35);
+}
+
+/* ================================
+   FIX: SETTINGS PANEL THEME COLORS
+   ================================ */
+
+/* --- DARK THEME --- */
+body.theme-dark .settings-panel {
+  background: #1a120f;
+  color: var(--text-main);
+  border: 1px solid rgba(0, 0, 0, 0.6);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(0, 0, 0, 0.45);
+}
+
+body.theme-dark .settings-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+body.theme-dark .settings-toggle input[type="radio"] {
+  accent-color: var(--accent);
+}
+
+/* --- NIGHT THEME --- */
+body.theme-night .settings-panel {
+  background: #020617;
+  color: var(--text-main);
+  border: 1px solid rgba(15, 23, 42, 0.7);
+  box-shadow:
+    0 18px 50px rgba(0, 0, 0, 0.85),
+    0 0 0 1px rgba(15, 23, 42, 0.8);
+}
+
+body.theme-night .settings-section {
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+body.theme-night .settings-toggle input[type="radio"] {
+  accent-color: var(--accent);
+}
+
+/* --- NORTH POLE THEME --- */
+body.theme-north .settings-panel {
+  background: #ffffff;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+  box-shadow:
+    0 18px 40px rgba(148, 180, 214, 0.25),
+    0 0 0 1px rgba(191, 219, 254, 0.7);
+}
+
+/* ================================
+   FIX: FILE LIST HEADER (Name | Size | Type | Modified | Path)
+   ================================ */
+
+body.theme-dark .file-list thead {
+  background: #2b1c16;
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
+}
+
+body.theme-night .file-list thead {
+  background: #0f172a;
+  box-shadow: 0 1px 0 rgba(148, 163, 184, 0.3);
+}
+
+body.theme-north .file-list thead {
+  background: #e0f2fe;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Ensure headers always have readable text */
+.file-list thead th {
+  color: var(--text-muted);
+}
+
+.tree-folder-active {
+  background-color: rgba(255, 255, 255, 0.06); /* tweak to taste */
+}
+
+/* ========= CONTEXT MENU ========= */
+
+.context-menu {
+  position: fixed;
+  z-index: 10000;
+  background: var(--panel-bg);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 0.25rem;
+  min-width: 150px;
+}
+
+.context-menu button {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 0.875rem;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.context-menu button:hover {
+  background: var(--accent-soft);
+  color: var(--app-bg);
+}

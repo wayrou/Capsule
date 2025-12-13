@@ -1,0 +1,66 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Capsule",
+  "version": "1.0.0",
+  "identifier": "com.capsule.app",
+
+  "build": {
+    "beforeDevCommand": "pnpm dev",
+    "beforeBuildCommand": "pnpm build",
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420"
+  },
+
+  "app": {
+    "windows": [
+      {
+        "title": "Capsule",
+        "width": 1100,
+        "height": 720,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+
+  "plugins": {
+
+    "shell": {}
+  },
+
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "icon": [
+      "icons/icon.ico",
+      "icons/icon.png",
+      "icons/32x32.png",
+      "icons/128x128.png"
+    ],
+    "fileAssociations": [
+      {
+        "ext": ["zip"],
+        "name": "Capsule ZIP archive",
+        "mimeType": "application/zip"
+      },
+      {
+        "ext": ["tar", "gz", "tgz", "bz2"],
+        "name": "Capsule TAR archive",
+        "mimeType": "application/x-tar"
+      },
+      {
+        "ext": ["7z"],
+        "name": "Capsule 7z archive",
+        "mimeType": "application/x-7z-compressed"
+      },
+      {
+        "ext": ["rar"],
+        "name": "Capsule RAR archive",
+        "mimeType": "application/vnd.rar"
+      }
+    ]
+  }
+}

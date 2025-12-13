@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Capsule</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+	 <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div class="app-shell">
+        <!-- HEADER / TOOLBAR -->
+        <header class="app-header">
+          <div class="app-title">
+            <span class="app-icon">📦</span>
+            <span class="app-name">Capsule</span>
+          </div>
+		  
+		  <header id="smart-status-bar" class="smart-status-bar">
+  <div id="smart-status-main" class="smart-status-main"></div>
+  <div id="smart-status-meta" class="smart-status-meta"></div>
+</header>
+
+<div id="file-context-menu" class="context-menu" hidden>
+  <button id="ctx-extract-entry" type="button">
+    Extract to…
+  </button>
+</div>
+
+
+
+          <div id="toolbar">
+  <button id="btn-browse-toolbar">Open</button>
+  <button id="btn-add-files">Add Files</button>
+  <button id="btn-save-archive">Save as ZIP…</button>
+  <button id="btn-remove-files">Remove</button>
+  <button id="btn-extract">Extract</button>
+</div>
+
+		  
+		  <!-- Somewhere under your header / toolbar -->
+
+
+
+          <!-- settings gear -->
+          <button id="btn-settings" class="icon-button" aria-label="Settings">
+            ⚙
+          </button>
+        </header>
+		
+		
+
+        <!-- MAIN CONTENT -->
+        <main class="app-main">
+          <section class="box-panel">
+		  <div id="tab-bar" class="tab-bar"></div>
+            <!-- DROPZONE / "LID" -->
+            <div id="dropzone" class="dropzone" tabindex="0">
+              <div class="dropzone-inner">
+                <p class="dropzone-title">Drop files or folders here</p>
+                <p class="dropzone-subtitle">…to open or create an archive</p>
+                <button id="btn-browse" type="button">Browse…</button>
+                <p class="dropzone-hint">
+                  Supports .zip, .tar, .tgz, .bz2, .rar (more coming soon)
+                </p>
+              </div>
+            </div>
+
+            <!-- CONTENT AREA -->
+            <div class="content-split">
+              <!-- LEFT SIDEBAR -->
+              <aside class="archive-sidebar">
+                <div class="archive-card">
+                  <h2 class="archive-title">No archive open</h2>
+                  <dl class="archive-stats">
+                    <div>
+                      <dt>Entries</dt>
+                      <dd id="stat-entries">—</dd>
+                    </div>
+                    <div>
+                      <dt>Size</dt>
+                      <dd id="stat-size">—</dd>
+                    </div>
+                    <div>
+                      <dt>Compressed</dt>
+                      <dd id="stat-compressed">—</dd>
+                    </div>
+                    <div>
+                      <dt>Saved</dt>
+                      <dd id="stat-saved">—</dd>
+                    </div>
+                    <div>
+                      <dt>Type</dt>
+                      <dd id="stat-type">—</dd>
+                    </div>
+                  </dl>
+                </div>
+
+                <div class="archive-tree">
+                  <div class="tree-header">
+                    <span>Contents</span>
+                  </div>
+                  <ul id="tree-view" class="tree-view">
+                    <li class="tree-empty">
+                      Open an archive to see its structure
+                    </li>
+                  </ul>
+                </div>
+              </aside>
+
+              <!-- RIGHT PANEL: FILE LIST -->
+              <section class="file-panel">
+                <div class="file-panel-header">
+                  <div class="file-panel-title">
+                    <span id="current-archive-name">No archive open</span>
+                  </div>
+                  <div class="file-panel-actions">
+                    <input
+                      id="search-input"
+                      type="search"
+                      placeholder="Search in archive…"
+                    />
+                    <select id="view-mode">
+                      <option value="flat">Flat view</option>
+                      <option value="tree">Tree view</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="file-list-wrapper">
+                  <table class="file-list">
+                    <thead>
+                      <tr>
+                        <th>Name</th>
+                        <th>Size</th>
+                        <th>Type</th>
+                        <th>Modified</th>
+                        <th>Path</th>
+                      </tr>
+                    </thead>
+                    <tbody id="file-list-body">
+                      <tr class="file-list-empty">
+                        <td colspan="5">
+                          Open an archive or drop files to get started.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            </div>
+          </section>
+        </main>
+
+        <!-- STATUS BAR -->
+        <footer class="status-bar">
+          <div id="status-text">
+            Ready. Drop files or click “Open…” to begin.
+          </div>
+          <div class="status-secondary">
+            <div class="status-progress" aria-hidden="true">
+              <div
+                class="status-progress-bar"
+                id="status-progress-bar"
+              ></div>
+            </div>
+          </div>
+        </footer>
+
+<!-- PREVIEW PANEL -->
+<div class="preview-panel">
+  <div class="preview-header">
+    <span id="preview-title">Preview</span>
+    <span id="preview-meta" class="preview-meta"></span>
+  </div>
+  <div class="preview-body">
+    <div id="preview-message" class="preview-message">
+      Select a file to see a preview.
+    </div>
+    <pre id="preview-text" class="preview-text" hidden></pre>
+    <img id="preview-image" class="preview-image" hidden />
+    <pre id="preview-hex" class="preview-hex" hidden></pre>
+  </div>
+  <div id="preview-footer" class="preview-footer"></div>
+</div>
+
+
+        <!-- SETTINGS OVERLAY -->
+        <div id="settings-overlay" class="settings-overlay">
+          <div id="settings-panel" class="settings-panel">
+            <header class="settings-header">
+              <h2>Settings</h2>
+              <button
+                id="btn-settings-close"
+                class="settings-close-btn"
+                aria-label="Close settings"
+              >
+                ×
+              </button>
+            </header>
+
+            <!-- APPEARANCE -->
+            <section class="settings-section">
+              <h3>Appearance</h3>
+              <div class="settings-toggle-group">
+                <label class="settings-toggle">
+                  <input
+                    type="radio"
+                    name="theme"
+                    value="light"
+                    id="theme-light"
+                  />
+                  <span>Light (Paper)</span>
+                </label>
+
+                <label class="settings-toggle">
+                  <input
+                    type="radio"
+                    name="theme"
+                    value="dark"
+                    id="theme-dark"
+                  />
+                  <span>Dark (Warm)</span>
+                </label>
+
+                <label class="settings-toggle">
+                  <input
+                    type="radio"
+                    name="theme"
+                    value="night"
+                    id="theme-night"
+                  />
+                  <span>Night Shift (Onyx)</span>
+                </label>
+				
+				    <label class="settings-toggle">
+      <input
+        type="radio"
+        name="theme"
+        value="north"
+        id="theme-north"
+      />
+      <span>North Pole (White)</span>
+    </label>
+
+              </div>
+			  <!-- ABOUT OVERLAY -->
+<div id="about-overlay">
+  <div class="about-panel">
+    <div class="about-header">
+      <div class="app-icon">📦</div>
+      <div>
+        <div class="about-title">Capsule</div>
+        <div class="about-meta">
+          <span id="about-version">Version —</span><br />
+          <span id="about-env">Loading environment…</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="about-body">
+      Capsule is a fast, minimal archive workbench.
+      Drop files, browse folders, and keep your clutter under control —
+      without getting in your way.
+    </p>
+
+    <div class="about-footer">
+      <div id="about-platform">OS: —</div>
+      <div id="about-arch">Architecture: —</div>
+      <div style="margin-top: 8px;">
+        © 2025 You. All rights reserved.
+      </div>
+    </div>
+
+    <div style="margin-top: 12px; text-align: right;">
+      <button id="about-close" type="button">Close</button>
+    </div>
+  </div>
+</div>
+
+            </section>
+
+            <!-- COMPRESSION -->
+            <section class="settings-section">
+              <h3>Compression</h3>
+
+              <label class="settings-toggle">
+                <span>Speed vs size</span>
+                <input
+                  id="compression-mode"
+                  type="range"
+                  min="0"
+                  max="2"
+                  step="1"
+                />
+              </label>
+              <p class="settings-note" id="compression-mode-label">
+                Balanced (good speed / good size)
+              </p>
+
+              <label class="settings-toggle">
+                <input type="checkbox" id="toggle-parallel-compression" />
+                <span>Use multi-core compression when possible</span>
+              </label>
+            </section>
+
+            <!-- TEMP FOLDER -->
+            <section class="settings-section">
+              <h3>Temporary files</h3>
+
+              <label class="settings-toggle">
+                <input
+                  type="radio"
+                  name="temp-dir-mode"
+                  value="system"
+                  id="temp-dir-system"
+                />
+                <span>Use system temp folder</span>
+              </label>
+
+              <label class="settings-toggle">
+                <input
+                  type="radio"
+                  name="temp-dir-mode"
+                  value="custom"
+                  id="temp-dir-custom"
+                />
+                <span>
+                  Use custom folder
+                  <button id="btn-choose-temp-dir" type="button">Choose…</button>
+                  <span id="temp-dir-display" class="settings-note"></span>
+                </span>
+              </label>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vite entry -->
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
