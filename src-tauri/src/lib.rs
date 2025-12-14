@@ -6,7 +6,6 @@ mod menu;
 use std::env;
 use tauri::Emitter;
 
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -17,14 +16,14 @@ pub fn run() {
         .setup(|app| {
             menu::init_menu(&app.handle())?;
             menu::wire_menu_events(&app.handle());
-			
-			  // Handle "Open with Capsule" – first non-zero arg is the path
-      let args: Vec<String> = env::args().collect();
-      if args.len() > 1 {
-        let path = args[1].clone();
-        let _ = app.emit("open-with://file", path);
-      }
-			
+
+            // Handle "Open with Capsule" – first non-zero arg is the path
+            let args: Vec<String> = env::args().collect();
+            if args.len() > 1 {
+                let path = args[1].clone();
+                let _ = app.emit("open-with://file", path);
+            }
+
             Ok(())
         })
         // Commands from src-tauri/src/commands.rs

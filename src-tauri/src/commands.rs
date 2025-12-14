@@ -7,13 +7,13 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use zip::{ZipArchive, ZipWriter};
 use zip::write::FileOptions;
 use zip::CompressionMethod;
+use zip::{ZipArchive, ZipWriter};
 
-use tar::Archive as TarArchive;
-use flate2::read::GzDecoder;
 use bzip2::read::BzDecoder;
+use flate2::read::GzDecoder;
+use tar::Archive as TarArchive;
 use xz2::read::XzDecoder;
 
 use base64::engine::general_purpose::STANDARD as BASE64;
@@ -37,7 +37,10 @@ pub(crate) fn validate_extract_path(dest: &Path, entry_path: &Path) -> Result<Pa
     for component in entry_path.components() {
         match component {
             std::path::Component::Prefix(_) | std::path::Component::RootDir => {
-                return Err(format!("Absolute paths not allowed: {}", entry_path.display()));
+                return Err(format!(
+                    "Absolute paths not allowed: {}",
+                    entry_path.display()
+                ));
             }
             std::path::Component::CurDir => {
                 // Skip `.` components
@@ -45,7 +48,10 @@ pub(crate) fn validate_extract_path(dest: &Path, entry_path: &Path) -> Result<Pa
             std::path::Component::ParentDir => {
                 // Prevent going up beyond dest - remove last component if possible
                 if parts.pop().is_none() {
-                    return Err(format!("Path traversal detected: {} escapes destination", entry_path.display()));
+                    return Err(format!(
+                        "Path traversal detected: {} escapes destination",
+                        entry_path.display()
+                    ));
                 }
             }
             std::path::Component::Normal(name) => {
@@ -56,14 +62,19 @@ pub(crate) fn validate_extract_path(dest: &Path, entry_path: &Path) -> Result<Pa
 
     let normalized = parts.iter().collect::<PathBuf>();
     let full_path = dest.join(&normalized);
-    
+
     // Final verification: ensure canonicalized path (if it exists) is within dest
-    if let (Ok(dest_canonical), Ok(full_canonical)) = (dest.canonicalize(), full_path.canonicalize()) {
+    if let (Ok(dest_canonical), Ok(full_canonical)) =
+        (dest.canonicalize(), full_path.canonicalize())
+    {
         if !full_canonical.starts_with(&dest_canonical) {
-            return Err(format!("Path traversal detected: {} escapes destination", entry_path.display()));
+            return Err(format!(
+                "Path traversal detected: {} escapes destination",
+                entry_path.display()
+            ));
         }
     }
-    
+
     Ok(full_path)
 }
 
@@ -93,7 +104,9 @@ fn open_zip(path: &Path) -> Result<Vec<CapsuleEntry>, String> {
 
     let mut entries = Vec::new();
     for i in 0..archive.len() {
-        let entry = archive.by_index(i).map_err(|e| format!("Zip entry error: {e}"))?;
+        let entry = archive
+            .by_index(i)
+            .map_err(|e| format!("Zip entry error: {e}"))?;
         let name = entry.name().to_string();
         let size = entry.size();
         let kind = if entry.is_dir() { "dir" } else { "file" }.to_string();
@@ -153,7 +166,9 @@ fn extract_zip(path: &Path, dest: &Path) -> Result<(), String> {
     fs::create_dir_all(dest).map_err(|e| format!("Failed to create dest dir: {e}"))?;
 
     for i in 0..archive.len() {
-        let mut file = archive.by_index(i).map_err(|e| format!("Zip entry error: {e}"))?;
+        let mut file = archive
+            .by_index(i)
+            .map_err(|e| format!("Zip entry error: {e}"))?;
         let entry_name = file.name();
         let entry_path = PathBuf::from(entry_name);
         let outpath = validate_extract_path(dest, &entry_path)?;
@@ -162,13 +177,11 @@ fn extract_zip(path: &Path, dest: &Path) -> Result<(), String> {
             fs::create_dir_all(&outpath).map_err(|e| format!("Dir create error: {e}"))?;
         } else {
             if let Some(parent) = outpath.parent() {
-                fs::create_dir_all(parent)
-                    .map_err(|e| format!("Parent dir create error: {e}"))?;
+                fs::create_dir_all(parent).map_err(|e| format!("Parent dir create error: {e}"))?;
             }
-            let mut outfile = File::create(&outpath)
-                .map_err(|e| format!("File create error: {e}"))?;
-            io::copy(&mut file, &mut outfile)
-                .map_err(|e| format!("Copy error: {e}"))?;
+            let mut outfile =
+                File::create(&outpath).map_err(|e| format!("File create error: {e}"))?;
+            io::copy(&mut file, &mut outfile).map_err(|e| format!("Copy error: {e}"))?;
         }
     }
 
@@ -188,8 +201,7 @@ fn extract_tar_like<R: Read>(mut archive: TarArchive<R>, dest: &Path) -> Result<
         let path = entry.path().map_err(|e| format!("Tar path error: {e}"))?;
         let outpath = validate_extract_path(dest, &path)?;
         if let Some(parent) = outpath.parent() {
-            fs::create_dir_all(parent)
-                .map_err(|e| format!("Parent dir create error: {e}"))?;
+            fs::create_dir_all(parent).map_err(|e| format!("Parent dir create error: {e}"))?;
         }
         entry
             .unpack(&outpath)
@@ -212,7 +224,11 @@ fn add_path_to_zip<W: Write + io::Seek>(
         .replace('\\', "/");
 
     if path.is_dir() {
-        let name = if rel.ends_with('/') { rel } else { format!("{rel}/") };
+        let name = if rel.ends_with('/') {
+            rel
+        } else {
+            format!("{rel}/")
+        };
         writer
             .add_directory(
                 &name,
@@ -250,28 +266,24 @@ pub async fn open_archive(path: String) -> Result<Vec<CapsuleEntry>, String> {
     match kind {
         "zip" => open_zip(&path_buf),
         "tar" => {
-            let file =
-                File::open(&path_buf).map_err(|e| format!("Failed to open tar: {e}"))?;
+            let file = File::open(&path_buf).map_err(|e| format!("Failed to open tar: {e}"))?;
             let archive = TarArchive::new(file);
             open_tar_like(archive)
         }
         "tar.gz" => {
-            let file =
-                File::open(&path_buf).map_err(|e| format!("Failed to open tar.gz: {e}"))?;
+            let file = File::open(&path_buf).map_err(|e| format!("Failed to open tar.gz: {e}"))?;
             let decoder = GzDecoder::new(file);
             let archive = TarArchive::new(decoder);
             open_tar_like(archive)
         }
         "tar.bz2" => {
-            let file =
-                File::open(&path_buf).map_err(|e| format!("Failed to open tar.bz2: {e}"))?;
+            let file = File::open(&path_buf).map_err(|e| format!("Failed to open tar.bz2: {e}"))?;
             let decoder = BzDecoder::new(file);
             let archive = TarArchive::new(decoder);
             open_tar_like(archive)
         }
         "tar.xz" => {
-            let file =
-                File::open(&path_buf).map_err(|e| format!("Failed to open tar.xz: {e}"))?;
+            let file = File::open(&path_buf).map_err(|e| format!("Failed to open tar.xz: {e}"))?;
             let decoder = XzDecoder::new(file);
             let archive = TarArchive::new(decoder);
             open_tar_like(archive)
@@ -290,28 +302,24 @@ pub async fn extract_archive(path: String, dest: String) -> Result<(), String> {
     match kind {
         "zip" => extract_zip(&path_buf, &dest_buf),
         "tar" => {
-            let file =
-                File::open(&path_buf).map_err(|e| format!("Failed to open tar: {e}"))?;
+            let file = File::open(&path_buf).map_err(|e| format!("Failed to open tar: {e}"))?;
             let archive = TarArchive::new(file);
             extract_tar_like(archive, &dest_buf)
         }
         "tar.gz" => {
-            let file =
-                File::open(&path_buf).map_err(|e| format!("Failed to open tar.gz: {e}"))?;
+            let file = File::open(&path_buf).map_err(|e| format!("Failed to open tar.gz: {e}"))?;
             let decoder = GzDecoder::new(file);
             let archive = TarArchive::new(decoder);
             extract_tar_like(archive, &dest_buf)
         }
         "tar.bz2" => {
-            let file =
-                File::open(&path_buf).map_err(|e| format!("Failed to open tar.bz2: {e}"))?;
+            let file = File::open(&path_buf).map_err(|e| format!("Failed to open tar.bz2: {e}"))?;
             let decoder = BzDecoder::new(file);
             let archive = TarArchive::new(decoder);
             extract_tar_like(archive, &dest_buf)
         }
         "tar.xz" => {
-            let file =
-                File::open(&path_buf).map_err(|e| format!("Failed to open tar.xz: {e}"))?;
+            let file = File::open(&path_buf).map_err(|e| format!("Failed to open tar.xz: {e}"))?;
             let decoder = XzDecoder::new(file);
             let archive = TarArchive::new(decoder);
             extract_tar_like(archive, &dest_buf)
@@ -325,7 +333,7 @@ pub async fn extract_archive(path: String, dest: String) -> Result<(), String> {
 pub struct CreateZipArgs {
     pub outputPath: String,
     pub inputPaths: Vec<String>,
-    pub compressionMode: String, // currently unused; all deflated
+    pub compressionMode: String,   // currently unused; all deflated
     pub parallelCompression: bool, // currently unused, but kept for future
     pub tempDir: Option<String>,
 }
@@ -336,12 +344,10 @@ pub async fn create_zip_archive(args: CreateZipArgs) -> Result<(), String> {
     let output = PathBuf::from(&args.outputPath);
 
     if let Some(parent) = output.parent() {
-        fs::create_dir_all(parent)
-            .map_err(|e| format!("Failed to create output dir: {e}"))?;
+        fs::create_dir_all(parent).map_err(|e| format!("Failed to create output dir: {e}"))?;
     }
 
-    let file = File::create(&output)
-        .map_err(|e| format!("Failed to create archive file: {e}"))?;
+    let file = File::create(&output).map_err(|e| format!("Failed to create archive file: {e}"))?;
     let mut writer = ZipWriter::new(file);
 
     for input in &args.inputPaths {
@@ -359,7 +365,9 @@ pub async fn create_zip_archive(args: CreateZipArgs) -> Result<(), String> {
         add_path_to_zip(&mut writer, &path, &base)?;
     }
 
-    writer.finish().map_err(|e| format!("Failed to finalize zip: {e}"))?;
+    writer
+        .finish()
+        .map_err(|e| format!("Failed to finalize zip: {e}"))?;
     Ok(())
 }
 
@@ -374,21 +382,20 @@ pub struct AddFilesArgs {
 #[tauri::command]
 pub async fn add_files_to_zip(args: AddFilesArgs) -> Result<(), String> {
     let zip_path = PathBuf::from(&args.zip);
-    let tmp_path = zip_path
-        .with_extension("tmp.zip");
+    let tmp_path = zip_path.with_extension("tmp.zip");
 
     // 1. Open existing zip (if present) and copy entries to new writer.
     let mut writer = {
-        let tmp_file = File::create(&tmp_path)
-            .map_err(|e| format!("Failed to create temp zip: {e}"))?;
+        let tmp_file =
+            File::create(&tmp_path).map_err(|e| format!("Failed to create temp zip: {e}"))?;
         ZipWriter::new(tmp_file)
     };
 
     if zip_path.exists() {
-        let file = File::open(&zip_path)
-            .map_err(|e| format!("Failed to open existing zip: {e}"))?;
-        let mut archive = ZipArchive::new(file)
-            .map_err(|e| format!("Invalid existing zip: {e}"))?;
+        let file =
+            File::open(&zip_path).map_err(|e| format!("Failed to open existing zip: {e}"))?;
+        let mut archive =
+            ZipArchive::new(file).map_err(|e| format!("Invalid existing zip: {e}"))?;
 
         for i in 0..archive.len() {
             let mut entry = archive
@@ -405,8 +412,7 @@ pub async fn add_files_to_zip(args: AddFilesArgs) -> Result<(), String> {
                 )
                 .map_err(|e| format!("Temp zip start file error: {e}"))?;
 
-            io::copy(&mut entry, &mut writer)
-                .map_err(|e| format!("Temp zip copy error: {e}"))?;
+            io::copy(&mut entry, &mut writer).map_err(|e| format!("Temp zip copy error: {e}"))?;
         }
     }
 
@@ -426,11 +432,12 @@ pub async fn add_files_to_zip(args: AddFilesArgs) -> Result<(), String> {
         add_path_to_zip(&mut writer, &path, &base)?;
     }
 
-    writer.finish().map_err(|e| format!("Failed to finalize temp zip: {e}"))?;
+    writer
+        .finish()
+        .map_err(|e| format!("Failed to finalize temp zip: {e}"))?;
 
     // 3. Replace original zip.
-    fs::rename(&tmp_path, &zip_path)
-        .map_err(|e| format!("Failed to replace original zip: {e}"))?;
+    fs::rename(&tmp_path, &zip_path).map_err(|e| format!("Failed to replace original zip: {e}"))?;
 
     Ok(())
 }
@@ -448,14 +455,12 @@ pub async fn remove_files_from_zip(args: RemoveFilesArgs) -> Result<(), String> 
     let zip_path = PathBuf::from(&args.zipPath);
     let tmp_path = zip_path.with_extension("tmp.zip");
 
-    let file = File::open(&zip_path)
-        .map_err(|e| format!("Failed to open existing zip: {e}"))?;
-    let mut archive = ZipArchive::new(file)
-        .map_err(|e| format!("Invalid existing zip: {e}"))?;
+    let file = File::open(&zip_path).map_err(|e| format!("Failed to open existing zip: {e}"))?;
+    let mut archive = ZipArchive::new(file).map_err(|e| format!("Invalid existing zip: {e}"))?;
 
     let mut writer = {
-        let tmp_file = File::create(&tmp_path)
-            .map_err(|e| format!("Failed to create temp zip: {e}"))?;
+        let tmp_file =
+            File::create(&tmp_path).map_err(|e| format!("Failed to create temp zip: {e}"))?;
         ZipWriter::new(tmp_file)
     };
 
@@ -479,13 +484,13 @@ pub async fn remove_files_from_zip(args: RemoveFilesArgs) -> Result<(), String> 
             )
             .map_err(|e| format!("Temp zip start file error: {e}"))?;
 
-        io::copy(&mut entry, &mut writer)
-            .map_err(|e| format!("Temp zip copy error: {e}"))?;
+        io::copy(&mut entry, &mut writer).map_err(|e| format!("Temp zip copy error: {e}"))?;
     }
 
-    writer.finish().map_err(|e| format!("Failed to finalize temp zip: {e}"))?;
-    fs::rename(&tmp_path, &zip_path)
-        .map_err(|e| format!("Failed to replace original zip: {e}"))?;
+    writer
+        .finish()
+        .map_err(|e| format!("Failed to finalize temp zip: {e}"))?;
+    fs::rename(&tmp_path, &zip_path).map_err(|e| format!("Failed to replace original zip: {e}"))?;
 
     Ok(())
 }
@@ -493,25 +498,23 @@ pub async fn remove_files_from_zip(args: RemoveFilesArgs) -> Result<(), String> 
 /// Simple "copy file" helper.
 #[tauri::command]
 pub async fn copy_file(src: String, dest: String) -> Result<(), String> {
-    fs::copy(&src, &dest)
-        .map_err(|e| format!("Failed to copy file: {e}"))?;
+    fs::copy(&src, &dest).map_err(|e| format!("Failed to copy file: {e}"))?;
     Ok(())
 }
 
 /// Get file size in bytes.
 #[tauri::command]
 pub async fn get_file_size(path: String) -> Result<u64, String> {
-    let metadata = fs::metadata(&path)
-        .map_err(|e| format!("Failed to read file metadata: {e}"))?;
+    let metadata = fs::metadata(&path).map_err(|e| format!("Failed to read file metadata: {e}"))?;
     Ok(metadata.len())
 }
 
 /// Preview result shape for frontend.
 #[derive(Debug, Serialize)]
 pub struct PreviewResult {
-    pub kind: String,          // "text" | "binary"
+    pub kind: String, // "text" | "binary"
     pub mime: String,
-    pub text: Option<String>,  // for text previews
+    pub text: Option<String>,        // for text previews
     pub data_base64: Option<String>, // for binary previews if you want
     pub size: u64,
 }
@@ -569,7 +572,7 @@ pub async fn preview_archive_entry(
 
     let size = entry.size();
     let mime = detect_mime_type(&entry_path);
-    
+
     // Limit preview size to 10MB to avoid memory issues
     let max_preview_size: u64 = 10 * 1024 * 1024;
     let read_size: usize = if size > max_preview_size {
@@ -601,8 +604,11 @@ pub async fn preview_archive_entry(
             // It's valid UTF-8, treat as text
             let short = if text.len() > 500 * 1024 {
                 // Limit text preview to 500KB for performance
-                format!("{}…\n\n[Preview truncated. Full file is {} bytes]", 
-                    &text[..500 * 1024], size)
+                format!(
+                    "{}…\n\n[Preview truncated. Full file is {} bytes]",
+                    &text[..500 * 1024],
+                    size
+                )
             } else {
                 text
             };
@@ -658,23 +664,16 @@ pub async fn extract_archive_entry_to_temp(
         .by_name(&entry_path)
         .map_err(|e| format!("Entry not found: {e}"))?;
 
-    let base_temp = temp_dir
-        .map(PathBuf::from)
-        .unwrap_or(std::env::temp_dir());
+    let base_temp = temp_dir.map(PathBuf::from).unwrap_or(std::env::temp_dir());
 
-    fs::create_dir_all(&base_temp)
-        .map_err(|e| format!("Failed to create temp dir: {e}"))?;
+    fs::create_dir_all(&base_temp).map_err(|e| format!("Failed to create temp dir: {e}"))?;
 
-    let safe_name = entry
-        .name()
-        .replace('/', "_")
-        .replace('\\', "_");
+    let safe_name = entry.name().replace('/', "_").replace('\\', "_");
     let out_path = base_temp.join(safe_name);
 
-    let mut outfile = File::create(&out_path)
-        .map_err(|e| format!("Failed to create temp file: {e}"))?;
-    io::copy(&mut entry, &mut outfile)
-        .map_err(|e| format!("Failed to write temp file: {e}"))?;
+    let mut outfile =
+        File::create(&out_path).map_err(|e| format!("Failed to create temp file: {e}"))?;
+    io::copy(&mut entry, &mut outfile).map_err(|e| format!("Failed to write temp file: {e}"))?;
 
     Ok(out_path.to_string_lossy().to_string())
 }
@@ -689,19 +688,25 @@ mod tests {
         assert_eq!(detect_archive_type(&PathBuf::from("test.tar")), "tar");
         assert_eq!(detect_archive_type(&PathBuf::from("test.tar.gz")), "tar.gz");
         assert_eq!(detect_archive_type(&PathBuf::from("test.tgz")), "tar.gz");
-        assert_eq!(detect_archive_type(&PathBuf::from("test.tar.bz2")), "tar.bz2");
+        assert_eq!(
+            detect_archive_type(&PathBuf::from("test.tar.bz2")),
+            "tar.bz2"
+        );
         assert_eq!(detect_archive_type(&PathBuf::from("test.tar.xz")), "tar.xz");
-        assert_eq!(detect_archive_type(&PathBuf::from("test.unknown")), "unknown");
+        assert_eq!(
+            detect_archive_type(&PathBuf::from("test.unknown")),
+            "unknown"
+        );
     }
 
     #[test]
     fn test_validate_extract_path_prevents_traversal() {
         let dest = PathBuf::from("/tmp/extract");
-        
+
         // Normal path should work
         let normal = PathBuf::from("file.txt");
         assert!(validate_extract_path(&dest, &normal).is_ok());
-        
+
         // Path with .. should be prevented (will fail when canonicalized)
         let traversal = PathBuf::from("../../etc/passwd");
         // This may pass if path doesn't exist, but should fail on actual extraction

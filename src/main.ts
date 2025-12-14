@@ -1305,7 +1305,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 // CONTEXT MENU
 // ----------------------------------------------------------
 
-function showContextMenu(x: number, y: number, entry: CapsuleEntry) {
+function showContextMenu(x: number, y: number, _entry: CapsuleEntry) {
   const menu = document.getElementById("file-context-menu");
   if (!menu) return;
 

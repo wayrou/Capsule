@@ -1,9 +1,7 @@
 // src-tauri/src/menu.rs
 use tauri::{
-    AppHandle,
-    Runtime,
-    Emitter,
     menu::{Menu, MenuBuilder, SubmenuBuilder},
+    AppHandle, Emitter, Runtime,
 };
 
 /// Build the app menu and attach it to the app.
