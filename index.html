@@ -2,342 +2,203 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Capsule</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-	 <link rel="stylesheet" href="/src/style.css" />
+    <title>Capsule</title>
   </head>
   <body>
-    <div id="app">
-      <div class="app-shell">
-        <!-- HEADER / TOOLBAR -->
-        <header class="app-header">
-          <div class="app-title">
-            <span class="app-icon">📦</span>
-            <span class="app-name">Capsule</span>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-block">
+          <div class="brand-mark" aria-hidden="true">
+            <span class="brand-mark-lid"></span>
+            <span class="brand-mark-body"></span>
           </div>
-		  
-		  <header id="smart-status-bar" class="smart-status-bar">
-  <div id="smart-status-main" class="smart-status-main"></div>
-  <div id="smart-status-meta" class="smart-status-meta"></div>
-</header>
+          <div class="brand-copy">
+            <div class="brand-row">
+              <h1>Capsule</h1>
+              <span id="archive-format-chip" class="chip" hidden></span>
+              <span id="archive-mode-chip" class="chip chip-muted" hidden></span>
+            </div>
+            <p id="status-text" class="status-copy">
+              Open an archive to explore it instantly, or stage files to build a ZIP.
+            </p>
+          </div>
+        </div>
 
-<div id="file-context-menu" class="context-menu" hidden>
-  <button id="ctx-extract-entry" type="button">
-    Extract to…
-  </button>
-</div>
-
-
-
-          <div id="toolbar">
-  <button id="btn-browse-toolbar">Open</button>
-  <button id="btn-add-files">Add Files</button>
-  <button id="btn-save-archive">Save as ZIP…</button>
-  <button id="btn-remove-files">Remove</button>
-  <button id="btn-extract">Extract</button>
-</div>
-
-		  
-		  <!-- Somewhere under your header / toolbar -->
-
-
-
-          <!-- settings gear -->
-          <button id="btn-settings" class="icon-button" aria-label="Settings">
-            ⚙
+        <div class="topbar-actions">
+          <button id="btn-open-archive" class="button button-primary" type="button">
+            Open archive
           </button>
-        </header>
-		
-		
+          <button id="btn-add-files" class="button" type="button">Add files</button>
+          <button id="btn-save-archive" class="button" type="button">Create ZIP</button>
+          <button id="btn-extract-all" class="button" type="button">Extract</button>
+          <button id="btn-settings" class="button button-icon" type="button" aria-label="Settings">
+            <span aria-hidden="true">⋯</span>
+          </button>
+        </div>
+      </header>
 
-        <!-- MAIN CONTENT -->
-        <main class="app-main">
-          <section class="box-panel">
-		  <div id="tab-bar" class="tab-bar"></div>
-            <!-- DROPZONE / "LID" -->
-            <div id="dropzone" class="dropzone" tabindex="0">
-              <div class="dropzone-inner">
-                <p class="dropzone-title">Drop files or folders here</p>
-                <p class="dropzone-subtitle">…to open or create an archive</p>
-                <button id="btn-browse" type="button">Browse…</button>
-                <p class="dropzone-hint">
-                  Supports .zip, .tar, .tgz, .bz2, .rar (more coming soon)
-                </p>
+      <main class="workspace">
+        <div id="tab-strip" class="tab-strip" hidden></div>
+
+        <section id="hero-panel" class="hero-panel">
+          <div class="hero-copy">
+            <p class="hero-kicker">Offline archive utility</p>
+            <h2>The fastest, cleanest way to open and explore an archive.</h2>
+            <p class="hero-description">
+              Drag in ZIP, 7z, TAR, or RAR files to browse their contents, preview entries, and
+              extract them without extra clutter.
+            </p>
+            <div class="hero-actions">
+              <button id="btn-open-hero" class="button button-primary" type="button">
+                Open archive
+              </button>
+              <span class="hero-hint">Supports ZIP, 7z, TAR family, and RAR.</span>
+            </div>
+          </div>
+        </section>
+
+        <div class="workspace-grid">
+          <aside class="sidebar">
+            <section id="summary-panel"></section>
+
+            <section class="panel panel-tree">
+              <div class="panel-head">
+                <div>
+                  <p class="panel-kicker">Contents</p>
+                  <h2>Folder tree</h2>
+                </div>
+                <button id="btn-clear-folder-filter" class="text-button" type="button" hidden>
+                  Show all
+                </button>
+              </div>
+              <div id="tree-panel" class="tree-panel"></div>
+            </section>
+          </aside>
+
+          <section class="main-column">
+            <div class="toolbar-row">
+              <label class="search-field">
+                <span class="search-label">Search</span>
+                <input id="search-input" type="search" placeholder="Filter by name or path" />
+              </label>
+              <div class="toolbar-actions">
+                <button id="btn-extract-selected" class="button" type="button">
+                  Extract selected
+                </button>
+                <button id="btn-remove-selected" class="button" type="button">
+                  Remove selected
+                </button>
               </div>
             </div>
 
-            <!-- CONTENT AREA -->
-            <div class="content-split">
-              <!-- LEFT SIDEBAR -->
-              <aside class="archive-sidebar">
-                <div class="archive-card">
-                  <h2 class="archive-title">No archive open</h2>
-                  <dl class="archive-stats">
-                    <div>
-                      <dt>Entries</dt>
-                      <dd id="stat-entries">—</dd>
-                    </div>
-                    <div>
-                      <dt>Size</dt>
-                      <dd id="stat-size">—</dd>
-                    </div>
-                    <div>
-                      <dt>Compressed</dt>
-                      <dd id="stat-compressed">—</dd>
-                    </div>
-                    <div>
-                      <dt>Saved</dt>
-                      <dd id="stat-saved">—</dd>
-                    </div>
-                    <div>
-                      <dt>Type</dt>
-                      <dd id="stat-type">—</dd>
-                    </div>
-                  </dl>
-                </div>
-
-                <div class="archive-tree">
-                  <div class="tree-header">
-                    <span>Contents</span>
-                  </div>
-                  <ul id="tree-view" class="tree-view">
-                    <li class="tree-empty">
-                      Open an archive to see its structure
-                    </li>
-                  </ul>
-                </div>
-              </aside>
-
-              <!-- RIGHT PANEL: FILE LIST -->
-              <section class="file-panel">
-                <div class="file-panel-header">
-                  <div class="file-panel-title">
-                    <span id="current-archive-name">No archive open</span>
-                  </div>
-                  <div class="file-panel-actions">
-                    <input
-                      id="search-input"
-                      type="search"
-                      placeholder="Search in archive…"
-                    />
-                    <select id="view-mode">
-                      <option value="flat">Flat view</option>
-                      <option value="tree">Tree view</option>
-                    </select>
+            <div class="content-grid">
+              <section class="panel table-panel">
+                <div class="panel-head panel-head-inline">
+                  <div>
+                    <p class="panel-kicker">Archive entries</p>
+                    <h2>Browse files</h2>
                   </div>
                 </div>
 
-                <div class="file-list-wrapper">
-                  <table class="file-list">
+                <div class="table-wrap">
+                  <table class="file-table">
                     <thead>
                       <tr>
                         <th>Name</th>
                         <th>Size</th>
-                        <th>Type</th>
+                        <th>Kind</th>
                         <th>Modified</th>
-                        <th>Path</th>
                       </tr>
                     </thead>
-                    <tbody id="file-list-body">
-                      <tr class="file-list-empty">
-                        <td colspan="5">
-                          Open an archive or drop files to get started.
-                        </td>
-                      </tr>
-                    </tbody>
+                    <tbody id="file-table-body"></tbody>
                   </table>
                 </div>
               </section>
+
+              <aside id="preview-panel" class="preview-panel"></aside>
             </div>
           </section>
-        </main>
-
-        <!-- STATUS BAR -->
-        <footer class="status-bar">
-          <div id="status-text">
-            Ready. Drop files or click “Open…” to begin.
-          </div>
-          <div class="status-secondary">
-            <div class="status-progress" aria-hidden="true">
-              <div
-                class="status-progress-bar"
-                id="status-progress-bar"
-              ></div>
-            </div>
-          </div>
-        </footer>
-
-<!-- PREVIEW PANEL -->
-<div class="preview-panel">
-  <div class="preview-header">
-    <span id="preview-title">Preview</span>
-    <span id="preview-meta" class="preview-meta"></span>
-  </div>
-  <div class="preview-body">
-    <div id="preview-message" class="preview-message">
-      Select a file to see a preview.
+        </div>
+      </main>
     </div>
-    <pre id="preview-text" class="preview-text" hidden></pre>
-    <img id="preview-image" class="preview-image" hidden />
-    <pre id="preview-hex" class="preview-hex" hidden></pre>
-  </div>
-  <div id="preview-footer" class="preview-footer"></div>
-</div>
 
+    <div id="settings-dialog" class="dialog" hidden>
+      <div class="dialog-card">
+        <div class="dialog-head">
+          <div>
+            <p class="panel-kicker">Settings</p>
+            <h2>Capsule preferences</h2>
+          </div>
+          <button id="btn-settings-close" class="button button-icon" type="button" aria-label="Close settings">
+            ×
+          </button>
+        </div>
 
-        <!-- SETTINGS OVERLAY -->
-        <div id="settings-overlay" class="settings-overlay">
-          <div id="settings-panel" class="settings-panel">
-            <header class="settings-header">
-              <h2>Settings</h2>
-              <button
-                id="btn-settings-close"
-                class="settings-close-btn"
-                aria-label="Close settings"
-              >
-                ×
-              </button>
-            </header>
+        <section class="dialog-section">
+          <p class="dialog-label">Appearance</p>
+          <label class="radio-row">
+            <input id="theme-light" type="radio" name="theme" />
+            <span>Light</span>
+          </label>
+          <label class="radio-row">
+            <input id="theme-dark" type="radio" name="theme" />
+            <span>Warm dark</span>
+          </label>
+        </section>
 
-            <!-- APPEARANCE -->
-            <section class="settings-section">
-              <h3>Appearance</h3>
-              <div class="settings-toggle-group">
-                <label class="settings-toggle">
-                  <input
-                    type="radio"
-                    name="theme"
-                    value="light"
-                    id="theme-light"
-                  />
-                  <span>Light (Paper)</span>
-                </label>
+        <section class="dialog-section">
+          <p class="dialog-label">Extraction</p>
+          <label class="toggle-row">
+            <input id="remember-extraction-path" type="checkbox" />
+            <span>Reuse the same extraction folder for one-click extraction</span>
+          </label>
+          <div class="path-row">
+            <span id="settings-extraction-path" class="path-label">No folder selected</span>
+            <button id="btn-choose-extraction-path" class="button" type="button">Choose folder</button>
+          </div>
+        </section>
 
-                <label class="settings-toggle">
-                  <input
-                    type="radio"
-                    name="theme"
-                    value="dark"
-                    id="theme-dark"
-                  />
-                  <span>Dark (Warm)</span>
-                </label>
+        <details class="dialog-section advanced-section">
+          <summary>Advanced</summary>
+          <label class="toggle-row">
+            <input id="logging-toggle" type="checkbox" />
+            <span>Enable debug logging in the developer console</span>
+          </label>
+        </details>
 
-                <label class="settings-toggle">
-                  <input
-                    type="radio"
-                    name="theme"
-                    value="night"
-                    id="theme-night"
-                  />
-                  <span>Night Shift (Onyx)</span>
-                </label>
-				
-				    <label class="settings-toggle">
-      <input
-        type="radio"
-        name="theme"
-        value="north"
-        id="theme-north"
-      />
-      <span>North Pole (White)</span>
-    </label>
-
-              </div>
-			  <!-- ABOUT OVERLAY -->
-<div id="about-overlay">
-  <div class="about-panel">
-    <div class="about-header">
-      <div class="app-icon">📦</div>
-      <div>
-        <div class="about-title">Capsule</div>
-        <div class="about-meta">
-          <span id="about-version">Version —</span><br />
-          <span id="about-env">Loading environment…</span>
+        <div class="dialog-actions">
+          <button id="btn-about" class="button" type="button">About Capsule</button>
         </div>
       </div>
     </div>
 
-    <p class="about-body">
-      Capsule is a fast, minimal archive workbench.
-      Drop files, browse folders, and keep your clutter under control —
-      without getting in your way.
-    </p>
-
-    <div class="about-footer">
-      <div id="about-platform">OS: —</div>
-      <div id="about-arch">Architecture: —</div>
-      <div style="margin-top: 8px;">
-        © 2025 You. All rights reserved.
-      </div>
-    </div>
-
-    <div style="margin-top: 12px; text-align: right;">
-      <button id="about-close" type="button">Close</button>
-    </div>
-  </div>
-</div>
-
-            </section>
-
-            <!-- COMPRESSION -->
-            <section class="settings-section">
-              <h3>Compression</h3>
-
-              <label class="settings-toggle">
-                <span>Speed vs size</span>
-                <input
-                  id="compression-mode"
-                  type="range"
-                  min="0"
-                  max="2"
-                  step="1"
-                />
-              </label>
-              <p class="settings-note" id="compression-mode-label">
-                Balanced (good speed / good size)
-              </p>
-
-              <label class="settings-toggle">
-                <input type="checkbox" id="toggle-parallel-compression" />
-                <span>Use multi-core compression when possible</span>
-              </label>
-            </section>
-
-            <!-- TEMP FOLDER -->
-            <section class="settings-section">
-              <h3>Temporary files</h3>
-
-              <label class="settings-toggle">
-                <input
-                  type="radio"
-                  name="temp-dir-mode"
-                  value="system"
-                  id="temp-dir-system"
-                />
-                <span>Use system temp folder</span>
-              </label>
-
-              <label class="settings-toggle">
-                <input
-                  type="radio"
-                  name="temp-dir-mode"
-                  value="custom"
-                  id="temp-dir-custom"
-                />
-                <span>
-                  Use custom folder
-                  <button id="btn-choose-temp-dir" type="button">Choose…</button>
-                  <span id="temp-dir-display" class="settings-note"></span>
-                </span>
-              </label>
-            </section>
+    <div id="about-dialog" class="dialog" hidden>
+      <div class="dialog-card">
+        <div class="dialog-head">
+          <div>
+            <p class="panel-kicker">About</p>
+            <h2 id="about-app-name">Capsule</h2>
+            <p id="about-app-version" class="dialog-copy">Desktop archive utility</p>
           </div>
+          <button id="btn-about-close" class="button button-icon" type="button" aria-label="Close about dialog">
+            ×
+          </button>
+        </div>
+
+        <p class="dialog-copy">
+          Capsule is a calm desktop archive utility designed for opening, previewing, and
+          extracting files locally, with no ads, no cloud hooks, and no unnecessary noise.
+        </p>
+
+        <div class="dialog-actions">
+          <button id="btn-about-dismiss" class="button button-primary" type="button">
+            Close
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- Vite entry -->
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
