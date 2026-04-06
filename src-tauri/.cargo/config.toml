@@ -1,0 +1,6 @@
+[env]
+CMAKE = "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\IDE\\CommonExtensions\\Microsoft\\CMake\\CMake\\bin\\cmake.exe"
+LIBCLANG_PATH = "C:\\Program Files\\LLVM\\bin"
+VCPKG_INSTALLATION_ROOT = "C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\VC\\vcpkg"
+VCPKG_TARGET_TRIPLET = "x64-windows-static-md"
+VCPKG_INSTALLED_DIR = { value = "vcpkg_installed", relative = true }

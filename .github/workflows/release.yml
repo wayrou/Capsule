@@ -10,14 +10,7 @@ permissions:
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: windows-latest
-            args: ""
-
-    runs-on: ${{ matrix.platform }}
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v4
@@ -29,10 +22,49 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "pnpm"
+          cache: pnpm
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Install LLVM
+        shell: pwsh
+        run: choco install llvm --no-progress -y
+
+      - name: Resolve Windows native toolchain paths
+        shell: pwsh
+        run: |
+          $llvmBin = "C:\Program Files\LLVM\bin"
+          if (-not (Test-Path -LiteralPath $llvmBin)) {
+            throw "LLVM was not installed at $llvmBin"
+          }
+
+          $cmakePath = (Get-Command cmake -ErrorAction Stop).Source
+          $vcpkgCandidates = @(
+            $env:VCPKG_INSTALLATION_ROOT,
+            "C:\Program Files (x86)\Microsoft Visual Studio\2022\Enterprise\VC\vcpkg",
+            "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\vcpkg",
+            "C:\Program Files (x86)\Microsoft Visual Studio\2022\Community\VC\vcpkg",
+            "C:\vcpkg"
+          ) | Where-Object { $_ } | Select-Object -Unique
+
+          $vcpkgRoot = $vcpkgCandidates | Where-Object {
+            Test-Path -LiteralPath (Join-Path $_ "vcpkg.exe")
+          } | Select-Object -First 1
+
+          if (-not $vcpkgRoot) {
+            throw "Unable to find vcpkg.exe on the GitHub runner."
+          }
+
+          "LIBCLANG_PATH=$llvmBin" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "CMAKE=$cmakePath" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "VCPKG_INSTALLATION_ROOT=$vcpkgRoot" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "VCPKG_TARGET_TRIPLET=x64-windows-static-md" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          "VCPKG_INSTALLED_DIR=$env:GITHUB_WORKSPACE\src-tauri\vcpkg_installed" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+
+      - name: Install native archive dependencies
+        shell: pwsh
+        run: .\src-tauri\scripts\setup-native-deps.ps1
 
       - name: Install frontend deps
         run: pnpm install
@@ -41,6 +73,8 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: "Capsule ${{ github.ref_name }}"

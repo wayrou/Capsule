@@ -29,14 +29,12 @@ pub fn run() {
         // Commands from src-tauri/src/commands.rs
         .invoke_handler(tauri::generate_handler![
             commands::open_archive,
+            commands::preview_archive_entry,
             commands::extract_archive,
+            commands::extract_selected_entries,
             commands::create_zip_archive,
             commands::add_files_to_zip,
             commands::remove_files_from_zip,
-            commands::copy_file,
-            commands::get_file_size,
-            commands::preview_archive_entry,
-            commands::extract_archive_entry_to_temp,
         ])
         // Run app
         .run(tauri::generate_context!())
